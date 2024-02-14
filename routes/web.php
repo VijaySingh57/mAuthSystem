@@ -20,3 +20,17 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::post('/user/logout', [App\Http\Controllers\Auth\LoginController::class, 'userlogout'])->name('user.logout');
+
+
+Route::group(['prefix' => 'admin'], function() {
+	Route::group(['middleware' => 'admin.guest'], function(){
+		Route::view('/login','admin.login')->name('admin.login');
+		Route::post('/login',[App\Http\Controllers\AdminController::class, 'authenticate'])->name('admin.auth');
+	});
+	
+	Route::group(['middleware' => 'admin.auth'], function(){
+		Route::get('/dashboard',[App\Http\Controllers\DashboardControlle::class, 'dashboard'])->name('admin.dashboard');
+		Route::get('/logout', [App\Http\Controllers\AdminController::class, 'logout'])->name('admin.logout');
+	});
+});
